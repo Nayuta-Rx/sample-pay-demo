@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hixtrip.sample.infra.db.mapper.OrderMapper">
+
+    <resultMap id="dataMap" type="com.hixtrip.sample.infra.db.dataobject.OrderDO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="sku_id" property="skuId"/>
+        <result column="amount" property="amount"/>
+        <result column="money" property="money"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="pay_url" property="payUrl"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.hixtrip.sample.infra.db.dataobject.OrderDO">
+        insert into order(user_id, sku_id, amount, money, pay_time, pay_status, pay_url,
+                          del_flag, create_by, create_time, update_by, update_time)
+        values(#{userId}, #{skuId}, #{amount}, #{money}, #{payTime}, #{payStatus},
+               #{payUrl}, #{delFlag}, #{createBy}, now(), #{updateBy}, now())
+    </insert>
+
+    <update id="updateOrderPayInfo" parameterType="com.hixtrip.sample.infra.db.dataobject.OrderDO">
+        update order set pay_url = #{payUrl}, pay_status = #{payStatus}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="changeOrderPaySuccess" parameterType="com.hixtrip.sample.infra.db.dataobject.OrderDO">
+        update order set pay_status = #{payStatus}, pay_time = now(), update_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="queryUnPayOrder" parameterType="com.hixtrip.sample.infra.db.dataobject.OrderDO" resultMap="dataMap">
+        select user_id, sku_id, amount, money, pay_time, pay_status, pay_url
+        from order
+        where user_id = #{userId} and sku_id = #{skuId}
+        order by id desc
+        limit 1
+    </select>
+</mapper>
